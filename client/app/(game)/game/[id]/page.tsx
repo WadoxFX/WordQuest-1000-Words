@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { socket } from '../layout'
 import { useIdSocket } from '@/hooks/useIdSocket'
+import ChoiceWords from '@/components/words/ChoiceWords'
 
 interface Params {
   params: {
@@ -11,6 +12,7 @@ interface Params {
 }
 
 const Game: React.FC<Params> = ({ params: { id } }) => {
+  const [game, setGame] = useState<boolean>(false)
   const { userId, loading } = useIdSocket()
 
   useEffect(() => {
@@ -30,6 +32,15 @@ const Game: React.FC<Params> = ({ params: { id } }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-svh">Loading...</div>
+    )
+  }
+
+  if (!game) {
+    return (
+      <main className="px-8 pt-8">
+        <ChoiceWords />
+        <div>Accept</div>
+      </main>
     )
   }
 

@@ -13,6 +13,7 @@ const GameLayout: React.FC<Children> = ({ children }) => {
       socket.disconnect()
     }
   }, [])
+  
   return children
 }
 

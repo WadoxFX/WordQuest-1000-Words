@@ -1,9 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { socket } from '../layout'
-import { useIdSocket } from '@/hooks/useIdSocket'
+
 import ChoiceWords from '@/components/words/ChoiceWords'
+import Controller from '@/components/game/Controller'
+import { useIdSocket } from '@/hooks/useIdSocket'
+
+import { socket } from '../layout'
 
 interface Params {
   params: {
@@ -17,16 +20,6 @@ const Game: React.FC<Params> = ({ params: { id } }) => {
 
   useEffect(() => {
     socket.emit('join_room', { room: id })
-
-    const getHelloMessage = ({ message }: { message: string }) => {
-      console.log(message)
-    }
-
-    socket.on('hello_message', getHelloMessage)
-
-    return () => {
-      socket.off('hello_message', getHelloMessage)
-    }
   }, [id])
 
   if (loading) {
@@ -37,9 +30,9 @@ const Game: React.FC<Params> = ({ params: { id } }) => {
 
   if (!game) {
     return (
-      <main className="px-8 pt-8">
+      <main className="px-8 pt-8 gap-5 grid grid-cols-[auto,max-content]">
         <ChoiceWords />
-        <div>Accept</div>
+        <Controller mySocket={userId as string} room={id} />
       </main>
     )
   }

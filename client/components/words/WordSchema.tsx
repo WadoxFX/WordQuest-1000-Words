@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import React from 'react'
+import { Button } from '../ui'
 
 interface WordSchemaProps {
   word: Word
@@ -17,15 +18,15 @@ const WordSchema: React.FC<WordSchemaProps> = ({
     <td className="border p-3">{word.word}</td>
     <td className="border p-3">{word.ru}</td>
     <td className="border w-16 h-16">
-      <button
-        className={clsx(
-          'transition-all aspect-square h-12 ml-[7px] rounded-xl',
-          selected ? 'bg-black text-white' : 'bg-blue-50 '
-        )}
+      <Button
         onClick={() => optionWord(word)}
+        className={clsx(
+          'transition-all duration-75 aspect-square h-12 ml-[7px] rounded-xl',
+          selected ? 'bg-black text-white' : 'bg-blue-50'
+        )}
       >
-        +
-      </button>
+        {selected ? '-' : '+'}
+      </Button>
     </td>
   </tr>
 )

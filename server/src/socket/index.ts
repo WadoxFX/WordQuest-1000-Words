@@ -27,6 +27,10 @@ class Room {
   isEmpty(): boolean {
     return this.rooms.size === 0
   }
+
+  playersInRoom(): string[] {
+    return Array.from(this.rooms)
+  }
 }
 
 const rooms: Rooms = {}
@@ -39,13 +43,18 @@ const SocketConnect = (server: HTTPserver) => {
       skipMiddlewares: true,
     },
     cors: {
-      origin: [process.env.CLIENT_URL],
+      origin: [process.env.CLIENT_URL, 'http://192.168.1.4:3000'],
       credentials: true,
     },
   })
 
   io.on('connection', (socket: SocketStuff) => {
     console.log(`User ${socket.id} connected`)
+
+    const updatePlayersInRoom = (room: string) => {
+      const quantity = rooms[room]?.playersInRoom().length || 0
+      io.to(room).emit('players_in_room', { quantity })
+    }
 
     socket.on('join_room', ({ room }) => {
       socket.room = room
@@ -56,7 +65,17 @@ const SocketConnect = (server: HTTPserver) => {
       }
 
       rooms[room].add(socket.id)
-      socket.broadcast.to(room).emit('hello_message', { message: `Joined new user ${socket.id}` })
+      updatePlayersInRoom(room)
+    })
+
+    socket.on('message', ({ content, room }) => {
+      socket.broadcast
+        .to(room)
+        .emit('get_message', { socket: socket.id, content })
+    })
+
+    socket.on('get_players_in_room', ({ room }) => {
+      updatePlayersInRoom(room)
     })
 
     socket.on('disconnect', (reason) => {
@@ -64,6 +83,7 @@ const SocketConnect = (server: HTTPserver) => {
 
       if (socket.room && rooms[socket.room]) {
         rooms[socket.room].remove(socket.id)
+        updatePlayersInRoom(socket.room)
 
         if (rooms[socket.room].isEmpty()) {
           delete rooms[socket.room]

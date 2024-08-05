@@ -1,6 +1,8 @@
 import React from 'react'
 
 import { useUsersInRoom } from '@/hooks/useUsersInRoom'
+import { useWords } from '@/store/useWords'
+import { socket } from '@/app/(game)/game/layout'
 
 import Chat from './Chat'
 
@@ -13,6 +15,12 @@ interface ControllerProps {
 
 const Controller: React.FC<ControllerProps> = ({ mySocket, room }) => {
   const { quantity, loading } = useUsersInRoom(room)
+  const { words, onClear } = useWords()
+
+  const handlerWords = () => {
+    socket.emit('send_words', { words })
+    onClear()
+  }
 
   return (
     <div className="sticky top-8 h-[calc(100svh-64px)] grid grid-rows-[auto,max-content]">
@@ -20,7 +28,9 @@ const Controller: React.FC<ControllerProps> = ({ mySocket, room }) => {
 
       <div className="flex justify-between items-end">
         <p>Players: {loading ? 'Loading...' : quantity}</p>
-        <Button variant="outlined">Ready</Button>
+        <Button onClick={handlerWords} variant="outlined">
+          Ready
+        </Button>
       </div>
     </div>
   )

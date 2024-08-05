@@ -5,13 +5,13 @@ import { Button } from '../ui'
 interface WordSchemaProps {
   word: Word
   selected: boolean
-  optionWord: (word: Word) => void
+  toggle: (word: Word) => void
 }
 
 const WordSchema: React.FC<WordSchemaProps> = ({
   word,
   selected,
-  optionWord,
+  toggle,
 }) => (
   <tr>
     <td className="border p-3">{word.id}</td>
@@ -19,7 +19,7 @@ const WordSchema: React.FC<WordSchemaProps> = ({
     <td className="border p-3">{word.ru}</td>
     <td className="border w-16 h-16">
       <Button
-        onClick={() => optionWord(word)}
+        onClick={() => toggle(word)}
         className={clsx(
           'transition-all duration-75 aspect-square h-12 ml-[7px] rounded-xl',
           selected ? 'bg-black text-white' : 'bg-blue-50'

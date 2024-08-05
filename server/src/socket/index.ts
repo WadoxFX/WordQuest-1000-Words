@@ -1,40 +1,25 @@
-import type { Server as HTTPserver } from 'http'
 import { Server, Socket } from 'socket.io'
+
+import type { Server as HTTPserver } from 'http'
+
+import Room from './room.js'
 
 type SocketStuff = Socket & {
   room: string
+}
+
+interface Word {
+  id: number
+  word: string
+  ru: string
 }
 
 interface Rooms {
   [key: string]: Room
 }
 
-class Room {
-  rooms: Set<string> = new Set()
-
-  add(id: string) {
-    this.rooms.add(id)
-  }
-
-  remove(id: string) {
-    this.rooms.delete(id)
-  }
-
-  hasUser(id: string): boolean {
-    return this.rooms.has(id)
-  }
-
-  isEmpty(): boolean {
-    return this.rooms.size === 0
-  }
-
-  playersInRoom(): string[] {
-    return Array.from(this.rooms)
-  }
-}
-
 const rooms: Rooms = {}
-setInterval(() => console.log(rooms), 3000)
+setInterval(() => console.log(rooms[503]), 3000)
 
 const SocketConnect = (server: HTTPserver) => {
   const io = new Server(server, {
@@ -64,25 +49,27 @@ const SocketConnect = (server: HTTPserver) => {
         rooms[room] = new Room()
       }
 
-      rooms[room].add(socket.id)
+      rooms[room].addUser(socket.id)
       updatePlayersInRoom(room)
     })
 
     socket.on('message', ({ content, room }) => {
-      socket.broadcast
-        .to(room)
-        .emit('get_message', { socket: socket.id, content })
+      socket.broadcast.to(room).emit('get_message', { socket: socket.id, content })
     })
 
     socket.on('get_players_in_room', ({ room }) => {
       updatePlayersInRoom(room)
     })
 
+    socket.on('send_words', ({ words }: { words: Word[] }) => {
+      rooms[socket.room].addWordToUser(socket.id, words)      
+    })
+
     socket.on('disconnect', (reason) => {
       console.log(`User ${socket.id} reason: ${reason}`)
 
       if (socket.room && rooms[socket.room]) {
-        rooms[socket.room].remove(socket.id)
+        rooms[socket.room].removeUser(socket.id)
         updatePlayersInRoom(socket.room)
 
         if (rooms[socket.room].isEmpty()) {

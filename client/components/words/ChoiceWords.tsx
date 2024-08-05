@@ -1,21 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import data from '@/lib/words.json'
 import WordSchema from './WordSchema'
+import { useWords } from '@/store/useWords'
 
 const ChoiceWords = () => {
-  const [words, setWords] = useState<Word[]>([])
-
-  const optionWord = (word: Word) => {
-    setWords((prev) => {
-      if (prev.includes(word)) {
-        return prev.filter((w) => w.id !== word.id)
-      } else {
-        return [...prev, word]
-      }
-    })
-  }
+  const { words, toggle } = useWords()
 
   return (
     <table className="max-w-[786px] w-full border">
@@ -33,7 +24,7 @@ const ChoiceWords = () => {
             key={word.id}
             word={word}
             selected={words.some((w) => w.id === word.id)}
-            optionWord={optionWord}
+            toggle={toggle}
           />
         ))}
       </tbody>

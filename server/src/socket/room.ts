@@ -1,52 +1,45 @@
+type Words = Word[]
 interface Word {
   id: number
   word: string
   ru: string
 }
 
-interface User {
-  words: Word[]
+interface Hero {
+  hp: number
+  mp: number
+}
+
+interface PlayerStuff {
+  words: Words
+  hero?: Hero
 }
 
 class Room {
-  private users: { [id: string]: User } = {}
+  players: { [key: string]: PlayerStuff } = {}
 
-  addUser(id: string) {
-    if (!this.users[id]) {
-      this.users[id] = { words: [] }
-    }
+  constructor(id: string) {
+    this.players[id] = { words: [] }
   }
 
-  removeUser(id: string) {
-    delete this.users[id]
+  addPlayer(id: string) {
+    this.players[id] = { words: [] }
   }
 
-  hasUser(id: string): boolean {
-    return !!this.users[id]
+  addWords(id: string, words: Words) {
+    this.players[id].words.push(...words)
+  }
+
+  remove(id: string) {
+    delete this.players[id]
   }
 
   isEmpty(): boolean {
-    return Object.keys(this.users).length === 0
+    return Object.keys(this.players).length === 0
   }
 
   playersInRoom(): string[] {
-    return Object.keys(this.users)
-  }
-
-  addWordToUser(userId: string, words: Word[]) {
-    if (this.hasUser(userId)) {
-      this.users[userId].words.push(...words)
-    }
-  }
-
-  removeWordFromUser(userId: string, wordId: number) {
-    if (this.hasUser(userId)) {
-      this.users[userId].words = this.users[userId].words.filter((word) => word.id !== wordId)
-    }
-  }
-
-  getWordsForUser(userId: string): Word[] {
-    return this.hasUser(userId) ? this.users[userId].words : []
+    return Object.keys(this.players)
   }
 }
 

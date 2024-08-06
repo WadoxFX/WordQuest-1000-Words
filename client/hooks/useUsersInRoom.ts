@@ -5,10 +5,7 @@ export const useUsersInRoom = (room: string) => {
   const [quantity, setQuantity] = useState<number>(0)
   const [loading, setLoading] = useState<boolean>(true)
 
-  console.log(loading, quantity)
-
   let intervalId
-
   if (quantity === 0) {
     intervalId = setInterval(() => {
       socket.emit('get_players_in_room', { room })

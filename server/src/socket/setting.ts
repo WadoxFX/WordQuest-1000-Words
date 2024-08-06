@@ -1,4 +1,4 @@
-export const IoSetting = {
+export const settings = {
   connectionStateRecovery: {
     maxDisconnectionDuration: 2 * 60 * 1000,
     skipMiddlewares: true,

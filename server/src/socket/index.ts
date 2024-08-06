@@ -1,28 +1,19 @@
 import { Server, Socket } from 'socket.io'
-
 import type { Server as HTTPserver } from 'http'
 
 import Room from './room.js'
-import { IoSetting } from './setting.js'
+
+import { settings } from './setting.js'
 
 type SocketStuff = Socket & {
   room: string
 }
 
-interface Word {
-  id: number
-  word: string
-  ru: string
-}
-
-interface Rooms {
-  [key: string]: Room
-}
-
-const rooms: Rooms = {}
+const rooms: { [key: string]: Room } = {}
+// setInterval(() => console.log(JSON.stringify(rooms, null, 2)), 1000)
 
 const SocketConnect = (server: HTTPserver) => {
-  const io = new Server(server, IoSetting)
+  const io = new Server(server, settings)
 
   io.on('connection', (socket: SocketStuff) => {
     console.log(`User ${socket.id} connected`)
@@ -37,14 +28,18 @@ const SocketConnect = (server: HTTPserver) => {
       socket.join(room)
 
       if (!rooms[room]) {
-        rooms[room] = new Room()
+        rooms[room] = new Room(socket.id)
+      } else {
+        rooms[room].addPlayer(socket.id)
       }
 
-      rooms[room].addUser(socket.id)
+      socket.broadcast
+        .to(room)
+        .emit('join_message', { message: `User ${socket.id.slice(-4)} joined the room` })
       updatePlayersInRoom(room)
     })
 
-    socket.on('message', ({ content, room }) => {
+    socket.on('send_message', ({ content, room }) => {
       socket.broadcast.to(room).emit('get_message', { socket: socket.id, content })
     })
 
@@ -52,16 +47,22 @@ const SocketConnect = (server: HTTPserver) => {
       updatePlayersInRoom(room)
     })
 
-    socket.on('send_words', ({ words }: { words: Word[] }) => {
-      rooms[socket.room].addWordToUser(socket.id, words)      
+    socket.on('send_words', ({ words }) => {
+      rooms[socket.room].addWords(socket.id, words)
     })
 
     socket.on('disconnect', (reason) => {
       console.log(`User ${socket.id} reason: ${reason}`)
 
       if (socket.room && rooms[socket.room]) {
-        rooms[socket.room].removeUser(socket.id)
+        socket.broadcast
+          .to(socket.room)
+          .emit('join_message', { message: `User ${socket.id.slice(-4)} leaves the room` })
+
         updatePlayersInRoom(socket.room)
+        socket.leave(socket.room)
+
+        rooms[socket.room].remove(socket.id)
 
         if (rooms[socket.room].isEmpty()) {
           delete rooms[socket.room]

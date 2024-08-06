@@ -33,11 +33,11 @@ const Chat: React.FC<ChatProps> = ({ mySocket, room }) => {
       })
     }
 
-    socket.on('hello_message', getHelloMessage)
+    socket.on('join_message', getHelloMessage)
     socket.on('get_message', getMessage)
 
     return () => {
-      socket.off('hello_message', getHelloMessage)
+      socket.off('join_message', getHelloMessage)
       socket.off('get_message', getMessage)
     }
   }, [room])
@@ -46,7 +46,7 @@ const Chat: React.FC<ChatProps> = ({ mySocket, room }) => {
     e.preventDefault()
 
     if (content.length) {
-      socket.emit('message', { content, room })
+      socket.emit('send_message', { content, room })
 
       setMessages((prev: Message[]) => [...prev, { socket: mySocket, content }])
       setContent('')

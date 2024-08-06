@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react'
 
 import ChoiceWords from '@/components/words/ChoiceWords'
 import Controller from '@/components/game/Controller'
+import { socket } from '@/components/socket'
 import { useIdSocket } from '@/hooks/useIdSocket'
-
-import { socket } from '../layout'
 
 interface Params {
   params: {

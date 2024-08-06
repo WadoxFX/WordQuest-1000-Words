@@ -1,4 +1,4 @@
-import { socket } from '@/app/(game)/game/layout'
+import { socket } from '@/components/socket'
 import { useEffect, useState } from 'react'
 
 export const useIdSocket = () => {

@@ -2,11 +2,11 @@ import React from 'react'
 
 import { useUsersInRoom } from '@/hooks/useUsersInRoom'
 import { useWords } from '@/store/useWords'
-import { socket } from '@/app/(game)/game/layout'
 
 import Chat from './Chat'
 
 import { Button } from '../ui'
+import { socket } from '../socket'
 
 interface ControllerProps {
   mySocket: string

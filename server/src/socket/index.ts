@@ -3,6 +3,7 @@ import { Server, Socket } from 'socket.io'
 import type { Server as HTTPserver } from 'http'
 
 import Room from './room.js'
+import { IoSetting } from './setting.js'
 
 type SocketStuff = Socket & {
   room: string
@@ -19,19 +20,9 @@ interface Rooms {
 }
 
 const rooms: Rooms = {}
-setInterval(() => console.log(rooms[503]), 3000)
 
 const SocketConnect = (server: HTTPserver) => {
-  const io = new Server(server, {
-    connectionStateRecovery: {
-      maxDisconnectionDuration: 2 * 60 * 1000,
-      skipMiddlewares: true,
-    },
-    cors: {
-      origin: [process.env.CLIENT_URL, 'http://192.168.1.4:3000'],
-      credentials: true,
-    },
-  })
+  const io = new Server(server, IoSetting)
 
   io.on('connection', (socket: SocketStuff) => {
     console.log(`User ${socket.id} connected`)

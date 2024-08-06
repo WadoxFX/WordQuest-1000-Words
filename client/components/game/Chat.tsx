@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
+
 import { Button } from '../ui'
-import { socket } from '@/app/(game)/game/layout'
+import { socket } from '../socket'
 
 interface ChatProps {
   mySocket: string
